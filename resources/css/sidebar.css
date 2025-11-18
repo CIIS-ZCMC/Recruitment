@@ -1,0 +1,68 @@
+/* ================================
+   FILAMENT CUSTOM SIDEBAR THEME
+   ================================ */
+
+/* Sidebar Panel */
+filament-sidebar::part(panel) {
+    background: #b33131;              /* Sidebar Background */
+    padding-top: 1rem;
+    border-right: 2px solid #8f2828;
+}
+
+/* Branding (Logo Area) */
+filament-sidebar::part(brand) {
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Navigation Items (Default State) */
+filament-sidebar::part(nav-item) {
+    border-radius: 8px;
+    margin: 2px 8px;
+    padding: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Navigation Text & Icons */
+filament-sidebar::part(nav-item) a,
+filament-sidebar::part(nav-icon) {
+    color: #ffffff !important;
+    font-weight: 500;
+}
+
+/* Hover State */
+filament-sidebar::part(nav-item):hover {
+    background-color: #8c2f2f;
+    transform: translateX(4px);
+}
+
+/* Active Navigation Item */
+filament-sidebar::part(nav-item-active) {
+    background: #631111;
+    font-weight: bold;
+    border-left: 4px solid #ffffff;
+    transform: translateX(6px);
+    color: #fff !important;
+}
+
+/* Active Icon Color */
+filament-sidebar::part(nav-icon-active) {
+    color: #fff !important;
+}
+
+/* Divider Lines */
+filament-sidebar::part(group-label) {
+    color: #ffecec;
+    opacity: 0.7;
+    margin-left: 12px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+/* Version footer text */
+filament-sidebar::part(footer) {
+    color: #ffffffcc;
+    font-size: 12px;
+    padding: 12px;
+}
