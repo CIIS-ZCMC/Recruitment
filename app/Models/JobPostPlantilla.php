@@ -13,5 +13,6 @@ class JobPostPlantilla extends Model
         'plantilla_no',
         'salary_grade',
         'salary',
+        'is_contract',
     ];
 }

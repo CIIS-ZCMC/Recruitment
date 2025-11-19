@@ -12,7 +12,6 @@ class JobPostStatus extends Model
 
     protected $fillable = [
         'job_post_id',
-        'no_of_vacancies',
         'place_of_assignment',
         'is_filled',
         'is_active',

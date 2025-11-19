@@ -19,6 +19,7 @@ return new class extends Migration
             $table->longText("qualification")->nullable();
             $table->longText("experience")->nullable();
             $table->longText("competencies")->nullable();
+            $table->longText("skills")->nullable();
             $table->longText("trainings")->nullable();
             $table->longText("additional_qualifications")->nullable();
             $table->timestamps();

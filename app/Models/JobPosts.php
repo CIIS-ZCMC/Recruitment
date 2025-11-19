@@ -16,7 +16,7 @@ class JobPosts extends Model
 
     public function plantilla()
     {
-        return $this->belongsTo(JobPostPlantilla::class, 'job_post_id', 'id');
+        return $this->hasMany(JobPostPlantilla::class, 'job_post_id', 'id');
     }
 
     public function qualifications()
@@ -26,16 +26,16 @@ class JobPosts extends Model
 
     public function required_files()
     {
-        return $this->hasMany(JobPostFiles::class, 'job_post_id', 'id');
+        return $this->hasMany(JobPostFiles::class,  'job_post_id', 'id');
     }
 
     public function status()
     {
-        return $this->hasOne(JobPostStatus::class, 'job_post_id', 'id');
+        return $this->belongsTo(JobPostStatus::class,  'id', 'job_post_id');
     }
 
     public function published()
     {
-        return $this->hasOne(PublishedJobPosts::class, 'job_post_id', 'id');
+        return $this->hasMany(PublishedJobPosts::class, 'job_post_id', 'id');
     }
 }

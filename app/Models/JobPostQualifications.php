@@ -14,6 +14,7 @@ class JobPostQualifications extends Model
         'qualification',
         'experience',
         'competencies',
+        'skills',
         'trainings',
         'additional_qualifications',
     ];

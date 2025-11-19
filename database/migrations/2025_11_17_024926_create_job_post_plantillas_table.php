@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text("plantilla_no");
             $table->text("salary_grade");
             $table->text("salary");
+            $table->boolean("is_contract")->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

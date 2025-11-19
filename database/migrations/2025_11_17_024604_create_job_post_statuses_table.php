@@ -16,7 +16,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('job_post_id');
             $table->foreign('job_post_id')->references('id')->on('job_posts');
-            $table->integer("no_of_vacancies");
             $table->text('place_of_assignment');
             $table->boolean("is_filled")->default(false);
             $table->boolean("is_active")->default(true);

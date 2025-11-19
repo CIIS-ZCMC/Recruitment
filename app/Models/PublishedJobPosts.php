@@ -11,8 +11,8 @@ class PublishedJobPosts extends Model
     protected $fillable = [
         'job_post_id',
         'published_date',
-        'close_date',
-        'close_time',
+        'closing_date',
+        'closing_time',
         'max_applicants',
     ];
 }
