@@ -5,6 +5,7 @@ namespace App\Filament\Resources\JobPosts\Pages;
 use App\Filament\Resources\JobPosts\JobPostsResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 
 class ListJobPosts extends ListRecords
@@ -16,6 +17,7 @@ class ListJobPosts extends ListRecords
         return [
             CreateAction::make()
                 ->icon(Heroicon::Plus),
+
         ];
     }
 }

@@ -121,6 +121,7 @@ class JobPostsForm
                         Checkbox::make('is_contract')
                             ->label("Is Contract of Service or Job Order")
                             ->afterStateHydrated(function ($component, $state, $record) {
+                                if (! $record) return;
                                 $component->state($record->plantilla->first()->is_contract);
                             })
                             ->live()
@@ -130,6 +131,7 @@ class JobPostsForm
                             ->required()
                             ->numeric()
                             ->afterStateHydrated(function ($component, $state, $record) {
+                                if (! $record) return;
                                 $component->state($record->plantilla->count());
                             })
                             ->hidden(fn(Get $get) => !$get('is_contract'))
