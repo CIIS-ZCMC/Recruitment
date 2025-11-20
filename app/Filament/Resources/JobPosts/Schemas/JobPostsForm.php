@@ -151,6 +151,7 @@ class JobPostsForm
                                         if (! $record) return;
                                         $data = $record->plantilla?->map(function ($item) {
                                             return [
+                                                'id' => $item->id,
                                                 'plantilla' => $item->plantilla_no,
                                             ];
                                         })->toArray() ?? [];
@@ -232,6 +233,7 @@ class JobPostsForm
                                 if (! $record) return;
                                 $data = $record->required_files?->map(function ($item) {
                                     return [
+                                        'id' => $item->id,
                                         'file_type' => $item->file_type,
                                         'file_name' => $item->file_name,
                                     ];

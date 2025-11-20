@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\JobPosts\Pages;
 
 use App\Filament\Resources\JobPosts\JobPostsResource;
+use App\Models\JobPostFiles;
+use App\Models\JobPostPlantilla;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -38,20 +40,37 @@ class EditJobPosts extends EditRecord
         $record->update($data);
 
         if (isset($data['plantilla'])) {
+
+            $updateData = [];
+
+            //   dd($data['plantilla']);
             foreach ($data['plantilla'] as $plantilla) {
-                $record->plantilla()->updateOrCreate([
-                    'job_post_id' => $record->id,
-                    'plantilla_no' => $plantilla['plantilla'],
-                    'salary_grade' => $data['salary_grade'],
-                    'salary' => $data['salary'],
-                ]);
+                $updateData[] = $plantilla['plantilla'];
+                if (isset($plantilla['id'])) {
+                    $record->plantilla()->where('id', $plantilla['id'])->update([
+                        'job_post_id' => $record->id,
+                        'plantilla_no' => $plantilla['plantilla'],
+                        'salary_grade' => $data['salary_grade'],
+                        'salary' => $data['salary'],
+                    ]);
+                } else {
+                    JobPostPlantilla::create([
+                        'job_post_id' => $record->id,
+                        'plantilla_no' => $plantilla['plantilla'],
+                        'salary_grade' => $data['salary_grade'],
+                        'salary' => $data['salary'],
+                    ]);
+                }
             }
+            //    dd($updateData);
+            $record->plantilla()->whereNotIn('plantilla_no', $updateData)->delete();
         } else {
             $jobTitle = $data['title'];
             $updateData = [];
             for ($i = 1; $i <= $data['no_of_vacancies']; $i++) {
 
                 $updateData[] = "JOB-ORDER-$jobTitle-$i";
+
                 $record->plantilla()->updateOrCreate(
                     [
                         'job_post_id' => $record->id,
@@ -67,27 +86,44 @@ class EditJobPosts extends EditRecord
             $record->plantilla()->whereNotIn('plantilla_no', $updateData)->delete();
         }
 
-        $record->qualifications()->updateOrCreate([
-            'job_post_id' => $record->id,
-            'educational_background' => $data['educational_background'],
-            'qualification' => $data['qualification'],
-            'experience' => $data['experience'],
-            'competencies' => $data['competencies'],
-            'trainings' => $data['trainings'],
-            'additional_qualifications' => isset($data['additional_qualifications']) ? $data['additional_qualifications'] : null,
-        ]);
+
+
+        $record->qualifications()->updateOrCreate(
+            ['job_post_id' => $record->id],
+            [
+                'educational_background' => $data['educational_background'],
+                'qualification' => $data['qualification'],
+                'experience' => $data['experience'],
+                'competencies' => $data['competencies'],
+                'skills' => $data['skills'],
+                'trainings' => $data['trainings'],
+                'additional_qualifications' => isset($data['additional_qualifications']) ? $data['additional_qualifications'] : null,
+            ]
+        );
 
         $updateDatafiles = [];
         foreach ($data['file_requirements'] as $file) {
             $updateDatafiles[] = $file['file_name'];
-            $record->required_files()->updateOrCreate(
-                [
-                    'job_post_id' => $record->id,
-                    'file_type' => $file['file_type'],
-                    'file_name' => $file['file_name'],
-                    'is_required' => true,
-                ]
-            );
+
+            if (isset($file['id'])) {
+                $record->required_files()->where('id', $file['id'])->update(
+                    [
+                        'job_post_id' => $record->id,
+                        'file_type' => $file['file_type'],
+                        'file_name' => $file['file_name'],
+                        'is_required' => true,
+                    ]
+                );
+            } else {
+                JobPostFiles::create(
+                    [
+                        'job_post_id' => $record->id,
+                        'file_type' => $file['file_type'],
+                        'file_name' => $file['file_name'],
+                        'is_required' => true,
+                    ]
+                );
+            }
         }
         $record->required_files()->whereNotIn('file_name', $updateDatafiles)->delete();
 
