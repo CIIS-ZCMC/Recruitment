@@ -6,6 +6,8 @@ namespace App\Providers;
 use Filament\Facades\Filament;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
+use Filament\Support\Facades\FilamentAsset;
+
 
 class AppServiceProvider extends ServiceProvider
 {

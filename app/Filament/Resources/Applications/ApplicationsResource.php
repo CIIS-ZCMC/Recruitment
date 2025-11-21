@@ -18,6 +18,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
+use App\Filament\Resources\Applications\Widgets\ApplicationsWidget;
+use App\Livewire\ApplicationStatsOverview;
 
 class ApplicationsResource extends Resource
 {
@@ -26,8 +28,6 @@ class ApplicationsResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::ClipboardDocumentList;
 
     protected static ?string $recordTitleAttribute = 'Applications';
-
-
 
     public static function form(Schema $schema): Schema
     {
@@ -53,10 +53,21 @@ class ApplicationsResource extends Resource
 
 
 
+
     public static function getNavigationBadge(): ?string
     {
         return  "5"; //static::getModel()::count();
     }
+
+
+
+    public static function getWidgets(): array
+    {
+        return [
+            ApplicationStatsOverview::class,
+        ];
+    }
+
 
     public static function getPages(): array
     {

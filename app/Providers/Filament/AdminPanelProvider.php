@@ -20,7 +20,8 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Actions\Action;
 use App\Filament\Pages\Settings;
-
+use App\Filament\Widgets\DashboardWidgets;
+use Filament\Tables\Grouping\Group;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -32,7 +33,10 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->spa()
             ->unsavedChangesAlerts()
-
+            ->colors([
+                'primary' => '#6366f1',
+            ])
+            ->font('Poppins')
             ->registerErrorNotification(
                 title: 'An error occurred',
                 body: 'Please try again later.',
@@ -48,6 +52,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn() => view('filament.adminLogo'))
             ->sidebarWidth('300px')
             ->sidebarCollapsibleOnDesktop()
+            //->viteTheme("resources/css/sidebar.css")
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -59,10 +64,7 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
+            ->widgets([])
 
             ->middleware([
                 EncryptCookies::class,
