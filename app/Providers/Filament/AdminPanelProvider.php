@@ -21,7 +21,10 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Actions\Action;
 use App\Filament\Pages\Settings;
 use App\Filament\Widgets\DashboardWidgets;
+use App\Filament\Pages\CalendarSchedules;
 use Filament\Tables\Grouping\Group;
+use Filament\Support\Assets\Css;
+use Filament\Support\Assets\Js;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -32,11 +35,16 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->spa()
+            ->topNavigation()
+            ->spaUrlExceptions(fn(): array => [
+                CalendarSchedules::getUrl(),
+            ])
             ->unsavedChangesAlerts()
             ->colors([
                 'primary' => '#6366f1',
             ])
-            ->font('Poppins')
+
+            // ->font('Poppins')
             ->registerErrorNotification(
                 title: 'An error occurred',
                 body: 'Please try again later.',
@@ -51,7 +59,7 @@ class AdminPanelProvider extends PanelProvider
 
             ->brandLogo(fn() => view('filament.adminLogo'))
             ->sidebarWidth('300px')
-            ->sidebarCollapsibleOnDesktop()
+            //->sidebarCollapsibleOnDesktop()
             //->viteTheme("resources/css/sidebar.css")
             ->colors([
                 'primary' => Color::Blue,
