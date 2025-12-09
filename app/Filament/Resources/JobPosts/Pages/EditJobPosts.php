@@ -5,23 +5,43 @@ namespace App\Filament\Resources\JobPosts\Pages;
 use App\Filament\Resources\JobPosts\JobPostsResource;
 use App\Models\JobPostFiles;
 use App\Models\JobPostPlantilla;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\IconPosition;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
+
+
 
 class EditJobPosts extends EditRecord
 {
     protected static string $resource = JobPostsResource::class;
 
+    protected function getFormActions(): array
+    {
+        return [];
+    }
+
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('Back')
+                ->color('gray')
+                ->icon(Heroicon::ArrowLeft)
+                ->iconPosition(IconPosition::Before)
+                ->extraAttributes([
+                    'onclick' => 'history.back()'
+                ]),
             ViewAction::make(),
-            DeleteAction::make(),
+            Action::make('save')
+                ->label('Save changes')
+                ->action(fn() => $this->save()),
+            //DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];

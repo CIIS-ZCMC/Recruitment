@@ -23,6 +23,8 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Group as ComponentsGroup;
+use Filament\Support\Enums\Alignment;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -109,6 +111,24 @@ class JobPostsTable
                                 DatePicker::make('until')->label(" To"),
                             ])->columns(2)
                     ])
+                    ->indicateUsing(function (array $state): ?string {
+                        $from  = $state['from'] ?? null;
+                        $until = $state['until'] ?? null;
+
+                        if ($from && $until) {
+                            return "Created: {$from} → {$until}";
+                        }
+
+                        if ($from) {
+                            return "Created from {$from}";
+                        }
+
+                        if ($until) {
+                            return "Created until {$until}";
+                        }
+
+                        return null;
+                    })
                     ->query(function (Builder $query, array $data) {
                         return $query
                             ->when($data['from'], fn($q) => $q->whereDate('created_at', '>=', $data['from']))
@@ -124,6 +144,11 @@ class JobPostsTable
                                 'filing_closed' => 'Filing Closed',
                             ])
                     ])
+                    ->indicateUsing(function (array $state): ?string {
+                        return filled($state['status'] ?? null)
+                            ? 'Status: ' . ucfirst(str_replace('_', ' ', $state['status']))
+                            : null;
+                    })
                     ->query(function (Builder $query, array $data) {
                         if ($data['status'] === 'published') {
                             return $query->whereHas('published', function ($q) {
@@ -153,6 +178,24 @@ class JobPostsTable
                                 DatePicker::make('until')->label(" To"),
                             ])->columns(2)
                     ])
+                    ->indicateUsing(function (array $state): ?string {
+                        $from  = $state['from'] ?? null;
+                        $until = $state['until'] ?? null;
+
+                        if ($from && $until) {
+                            return "Published: {$from} → {$until}";
+                        }
+
+                        if ($from) {
+                            return "Published from {$from}";
+                        }
+
+                        if ($until) {
+                            return "Published until {$until}";
+                        }
+
+                        return null;
+                    })
                     ->query(function (Builder $query, array $data) {
                         return $query
                             ->when($data['from'], fn($q) => $q->whereHas('published', function ($subQ) use ($data) {
@@ -165,6 +208,8 @@ class JobPostsTable
 
 
             ])
+
+
             ->recordActions([
 
                 ActionGroup::make([
@@ -251,6 +296,7 @@ class JobPostsTable
 
                             return $published->published_date > now()->toDateString();
                         })
+                        ->requiresConfirmation()
                         ->action(function ($record) {
                             $record->published()->updateOrCreate(
                                 ['job_post_id' => $record->id],
@@ -272,6 +318,7 @@ class JobPostsTable
                 ])
 
             ])
+            ->recordActionsAlignment("Start")
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

@@ -14,6 +14,7 @@
 
         .bg-white {
             background-color: #fff;
+            color: black
         }
 
         .p-4 {

@@ -3,17 +3,51 @@
 namespace App\Filament\Resources\JobPosts\Pages;
 
 use App\Filament\Resources\JobPosts\JobPostsResource;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Enums\IconPosition;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 
 class CreateJobPosts extends CreateRecord
 {
     protected static string $resource = JobPostsResource::class;
 
+
+
     protected function getSavedNotification(): ?Notification
     {
         return null;
+    }
+    protected function getFormActions(): array
+    {
+        return []; // removes "Create" and "Create & create another"
+    }
+
+
+    public function getHeaderActions(): array
+    {
+        return [
+            Action::make('Back')
+                ->color('gray')
+                ->icon(Heroicon::ArrowLeft)
+                ->iconPosition(IconPosition::Before)
+                ->extraAttributes([
+                    'onclick' => 'history.back()'
+                ]),
+            Action::make('create')
+                ->label('Create')
+                ->action(fn() => $this->create()),
+
+            Action::make('create_another')
+                ->label('Create & Create Another')
+                ->outlined()
+                ->action(function () {
+                    $this->createAnother();
+                }),
+
+        ];
     }
 
     protected function handleRecordCreation($data): Model

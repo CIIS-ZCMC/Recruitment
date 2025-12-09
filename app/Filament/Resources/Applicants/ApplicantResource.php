@@ -23,9 +23,14 @@ class ApplicantResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
 
-    protected static ?string $recordTitleAttribute = 'Applicants';
+    protected static ?string $recordTitleAttribute = 'Applicants List';
 
+    protected static ?string $navigationLabel = 'Applicants';
+
+    protected static ?string $label = 'Applicants List';
     protected static string | UnitEnum | null $navigationGroup = 'Management';
+
+
 
     public static function form(Schema $schema): Schema
     {
