@@ -21,4 +21,29 @@ class Applicant extends Model
     {
         return $this->hasOne(ApplicantInformation::class);
     }
+
+    public function educationalBackground()
+    {
+        return $this->hasMany(ApplicantEducation::class);
+    }
+
+    public function eligibilityRecords()
+    {
+        return $this->hasMany(ApplicantEligibility::class);
+    }
+
+    public function workExperiences()
+    {
+        return $this->hasMany(ApplicantExperiences::class);
+    }
+
+    public function voluntaryWork()
+    {
+        return $this->hasMany(ApplicantVoluntaryWork::class);
+    }
+
+    public function trainings()
+    {
+        return $this->hasMany(ApplicantTraining::class);
+    }
 }

@@ -26,6 +26,11 @@ class ApplicationStatsOverview extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success')
                 ->chart([7, 2, 10, 3, 15, 4, 17]),
+            Stat::make('Average time on page', '3:12')
+                ->description('3% increase')
+                ->descriptionIcon('heroicon-m-arrow-trending-up')
+                ->color('success')
+                ->chart([7, 2, 10, 3, 15, 4, 17]),
         ];
     }
 }

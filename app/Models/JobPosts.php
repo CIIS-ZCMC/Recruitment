@@ -36,6 +36,6 @@ class JobPosts extends Model
 
     public function published()
     {
-        return $this->hasMany(PublishedJobPosts::class, 'job_post_id', 'id');
+        return $this->hasOne(PublishedJobPosts::class, 'job_post_id', 'id');
     }
 }

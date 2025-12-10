@@ -25,18 +25,11 @@ class ListApplications extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            ApplicationStatsOverview::class,
+            // ApplicationStatsOverview::class,
         ];
     }
 
-    protected function getFooterWidgets(): array
-    {
-        return [
-            CustomApplicationWidget1::class,
-            CustomApplicationWidget2::class,
-            CustomApplicationWidget3::class,
-        ];
-    }
+
 
     public function getFooterWidgetsColumns(): int|array
     {

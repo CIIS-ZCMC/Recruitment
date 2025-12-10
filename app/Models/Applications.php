@@ -14,4 +14,15 @@ class Applications extends Model
         'status',
         'remarks',
     ];
+
+
+    public function publishedJobPosts()
+    {
+        return $this->hasOne(PublishedJobPosts::class, 'id', 'published_job_post_id');
+    }
+
+    public function applicant()
+    {
+        return $this->hasOne(Applicant::class, "id", "applicant_id");
+    }
 }

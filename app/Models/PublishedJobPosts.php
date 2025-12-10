@@ -15,4 +15,9 @@ class PublishedJobPosts extends Model
         'closing_time',
         'max_applicants',
     ];
+
+    public function jobPost()
+    {
+        return $this->hasOne(JobPosts::class, "id", "job_post_id");
+    }
 }

@@ -56,7 +56,7 @@ class ApplicationsResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return  "5"; //static::getModel()::count();
+        return  Applications::where("status", "pending")->count();
     }
 
 
