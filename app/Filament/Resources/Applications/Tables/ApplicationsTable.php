@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Applications\Tables;
 
+use App\Http\Controllers\ApplicantController;
+use App\Http\Controllers\ApplicationController;
 use App\Models\JobPosts;
 use App\Models\PublishedJobPosts;
 use Carbon\Carbon;
@@ -24,6 +26,7 @@ use Filament\Tables\Table;
 
 class ApplicationsTable
 {
+
     public static function configure(Table $table): Table
     {
         return $table
@@ -52,7 +55,7 @@ class ApplicationsTable
                     ->badge()
                     ->weight("small")
                     ->size("14px")
-                    ->formatStateUsing(fn(string $state): string => strtoupper($state))
+                    ->formatStateUsing(fn(string $state): string =>  strtoupper(str_replace('_', ' ', $state)))
                     ->color(fn(string $state): string => match ($state) {
 
                         // Pre-Screening
@@ -211,10 +214,20 @@ class ApplicationsTable
                         ->color("danger"),
                     Action::make("Set for Initial screening")
                         ->icon(Heroicon::ChatBubbleBottomCenter)
-                        ->color("success"),
+                        ->hidden(function ($record) {
+                            return $record->status !== 'pending';
+                        })
+                        ->color("success")
+                        ->requiresConfirmation()
+                        ->action(function ($record) {
+                            return ApplicationController::ChangeStatus('for_initial_screening', $record->id);
+                        }),
                     Action::make("Set for Interview")
                         ->icon(Heroicon::Calendar)
                         ->color("warning"),
+                    // ->action(function ($record) {
+                    //     return ApplicationController::ChangeStatus('for_interview', $record->id);
+                    // }),
 
                     Action::make("change_status")
                         ->icon(Heroicon::ListBullet)
@@ -257,7 +270,12 @@ class ApplicationsTable
                                 ])
 
                         ])
-                        ->modalWidth("md"),
+                        ->modalWidth("md")
+                        ->action(function ($record, $data) {
+
+                            return ApplicationController::ChangeStatus($data['change_status'], $record->id);
+                        })
+                        ->requiresConfirmation(),
 
 
 
