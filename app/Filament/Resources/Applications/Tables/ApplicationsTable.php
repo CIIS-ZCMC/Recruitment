@@ -6,6 +6,8 @@ use App\Models\JobPosts;
 use App\Models\PublishedJobPosts;
 use Carbon\Carbon;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -14,6 +16,7 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard\Actions\FilterAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -33,8 +36,7 @@ class ApplicationsTable
                     ->getStateUsing(
                         fn($record) =>
                         Carbon::parse($record->applicant->personalInformation->date_of_birth)->age
-                    )
-                    ->sortable(),
+                    ),
                 TextColumn::make('applicant.personalInformation.sex')
                     ->label("Gender")
                     ->sortable(),
@@ -52,24 +54,45 @@ class ApplicationsTable
                     ->size("14px")
                     ->formatStateUsing(fn(string $state): string => strtoupper($state))
                     ->color(fn(string $state): string => match ($state) {
-                        'pending'           => 'warning',
-                        'approved'          => 'success',
-                        'shortlisted'       => 'info',
-                        'interviewed'       => 'primary',
-                        'recommended'       => 'primary',
-                        'hired'             => 'success',
-                        'onboarded'         => 'success',
 
-                        // Negative / terminal statuses
-                        'failed_interview'  => 'danger',
-                        'not_qualified'     => 'danger',
-                        'rejected'          => 'danger',
-                        'not_selected'      => 'danger',
-                        'withdrawn'         => 'gray',
-                        'no_show'           => 'gray',
+                        // Pre-Screening
+                        'pending'                   => 'warning',
+                        'for_initial_screening'     => 'info',
+                        'for_shortlisting'          => 'info',
 
-                        default             => 'secondary',
+                        // Shortlisting & Evaluation
+                        'shortlisted'               => 'primary',
+                        'for_interview'             => 'primary',
+                        'interviewed'               => 'primary',
+                        'for_assessment'            => 'primary',
+                        'assessment_completed'      => 'success',
+
+                        // Background Check & Recommendation
+                        'for_background_check'      => 'info',
+                        'recommended'               => 'primary',
+                        'for_final_deliberation'    => 'info',
+                        'approved_for_hire'         => 'success',
+
+                        // Hiring & Onboarding
+                        'job_offer_sent'            => 'warning',
+                        'job_offer_accepted'        => 'success',
+                        'pre_employment_requirements' => 'info',
+                        'hired'                     => 'success',
+                        'onboarded'                 => 'success',
+
+                        // Negative / End-of-process
+                        'not_qualified'             => 'danger',
+                        'failed_assessment'         => 'danger',
+                        'failed_interview'          => 'danger',
+                        'not_selected'              => 'danger',
+                        'rejected'                  => 'danger',
+                        'withdrawn'                 => 'gray',
+                        'no_show'                   => 'gray',
+                        'offer_declined'            => 'gray',
+
+                        default                     => 'secondary',
                     }),
+
                 TextColumn::make('created_at')
                     ->label("Date Applied")
                     ->dateTime("h:ia M j,Y ")
@@ -104,21 +127,40 @@ class ApplicationsTable
                     ->label('Status')
                     ->options(function () {
                         return [
-                            'pending'           => 'Pending',
-                            'approved'          => 'Approved',
-                            'shortlisted'       => 'Shortlisted',
-                            'interviewed'       => 'Interviewed',
-                            'recommended'       => 'Recommended',
-                            'hired'             => 'Hired',
-                            'onboarded'         => 'Onboarded',
+                            // Pre-Screening
+                            'pending'                   => 'Pending',
+                            'for_initial_screening'     => 'For Initial Screening',
+                            'for_shortlisting'          => 'For Shortlisting',
 
-                            // Negative / terminal statuses
-                            'failed_interview'  => 'Failed_interview',
-                            'not_qualified'     => 'Not_qualified',
-                            'rejected'          => 'Rejected',
-                            'not_selected'      => 'Not_selected',
-                            'withdrawn'         => 'Withdrawn',
-                            'no_show'           => 'No_show',
+                            // Shortlisting & Evaluation
+                            'shortlisted'               => 'Shortlisted',
+                            'for_interview'             => 'For Interview',
+                            'interviewed'               => 'Interviewed',
+                            'for_assessment'            => 'For Assessment',
+                            'assessment_completed'      => 'Assessment Completed',
+
+                            // Background Check & Recommendation
+                            'for_background_check'      => 'For Background Check',
+                            'recommended'               => 'Recommended',
+                            'for_final_deliberation'    => 'For Final Deliberation',
+                            'approved_for_hire'         => 'Approved for Hire',
+
+                            // Hiring & Onboarding
+                            'job_offer_sent'            => 'Job Offer Sent',
+                            'job_offer_accepted'        => 'Job Offer Accepted',
+                            'pre_employment_requirements' => 'Pre-Employment Requirements',
+                            'hired'                     => 'Hired',
+                            'onboarded'                 => 'Onboarded',
+
+                            // Negative Results
+                            'not_qualified'             => 'Not Qualified',
+                            'failed_assessment'         => 'Failed Assessment',
+                            'failed_interview'          => 'Failed Interview',
+                            'not_selected'              => 'Not Selected',
+                            'rejected'                  => 'Rejected',
+                            'withdrawn'                 => 'Withdrawn',
+                            'no_show'                   => 'No-Show',
+                            'offer_declined'            => 'Offer Declined',
                         ];
                     })
                     ->query(function ($query, $data) {
@@ -134,14 +176,180 @@ class ApplicationsTable
 
             ])
             ->recordActions([
-                // ViewAction::make(),
-                // EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    ActionGroup::make([
+                        Action::make('Acknowledgement Email')
+                            ->icon(Heroicon::BellAlert),
+                        Action::make('Letter of Regret')
+                            ->icon(Heroicon::BellAlert),
+                        Action::make('Custom Message')
+                            ->icon(Heroicon::BellAlert),
+
+                    ])
+                        ->label("Send Email Notification")
+                        ->icon(Heroicon::Envelope),
+
+
+                    ActionGroup::make([
+                        Action::make('Educational Background')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Training')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Experience')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Eligibility')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Incomplete file uploads')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Others')
+                            ->icon(Heroicon::InformationCircle),
+
+                    ])
+                        ->label("Mark not qualified")
+                        ->icon(Heroicon::NoSymbol)
+                        ->color("danger"),
+                    Action::make("Set for Initial screening")
+                        ->icon(Heroicon::ChatBubbleBottomCenter)
+                        ->color("success"),
+                    Action::make("Set for Interview")
+                        ->icon(Heroicon::Calendar)
+                        ->color("warning"),
+
+                    Action::make("change_status")
+                        ->icon(Heroicon::ListBullet)
+                        ->schema([
+                            Select::make("change_status")
+                                ->label("Change Application Status")
+                                ->options([
+
+                                    // Shortlisting
+                                    'for_shortlisting'          => 'For Shortlisting',
+
+                                    // Shortlisting & Evaluation
+                                    'shortlisted'               => 'Shortlisted',
+                                    'interviewed'               => 'Interviewed',
+                                    'for_assessment'            => 'For Assessment',
+                                    'assessment_completed'      => 'Assessment Completed',
+
+                                    // Background Check & Recommendation
+                                    'for_background_check'      => 'For Background Check',
+                                    'recommended'               => 'Recommended',
+                                    'for_final_deliberation'    => 'For Final Deliberation',
+                                    'approved_for_hire'         => 'Approved for Hire',
+
+                                    // Hiring & Onboarding
+                                    'job_offer_sent'            => 'Job Offer Sent',
+                                    'job_offer_accepted'        => 'Job Offer Accepted',
+                                    'pre_employment_requirements' => 'Pre-Employment Requirements',
+                                    'hired'                     => 'Hired',
+                                    'onboarded'                 => 'Onboarded',
+
+                                    // Negative Results
+                                    'not_qualified'             => 'Not Qualified',
+                                    'failed_assessment'         => 'Failed Assessment',
+                                    'failed_interview'          => 'Failed Interview',
+                                    'not_selected'              => 'Not Selected',
+                                    'rejected'                  => 'Rejected',
+                                    'withdrawn'                 => 'Withdrawn',
+                                    'no_show'                   => 'No-Show',
+                                    'offer_declined'            => 'Offer Declined',
+                                ])
+
+                        ])
+                        ->modalWidth("md"),
+
+
+
+                ])
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
+                    BulkAction::make("change_status")
+                        ->icon(Heroicon::ListBullet)
+                        ->schema([
+                            Select::make("change_status")
+                                ->label("Change Application Status")
+                                ->options([
+
+                                    // Shortlisting
+                                    'for_shortlisting'          => 'For Shortlisting',
+
+                                    // Shortlisting & Evaluation
+                                    'shortlisted'               => 'Shortlisted',
+                                    'interviewed'               => 'Interviewed',
+                                    'for_assessment'            => 'For Assessment',
+                                    'assessment_completed'      => 'Assessment Completed',
+
+                                    // Background Check & Recommendation
+                                    'for_background_check'      => 'For Background Check',
+                                    'recommended'               => 'Recommended',
+                                    'for_final_deliberation'    => 'For Final Deliberation',
+                                    'approved_for_hire'         => 'Approved for Hire',
+
+                                    // Hiring & Onboarding
+                                    'job_offer_sent'            => 'Job Offer Sent',
+                                    'job_offer_accepted'        => 'Job Offer Accepted',
+                                    'pre_employment_requirements' => 'Pre-Employment Requirements',
+                                    'hired'                     => 'Hired',
+                                    'onboarded'                 => 'Onboarded',
+
+                                    // Negative Results
+                                    'not_qualified'             => 'Not Qualified',
+                                    'failed_assessment'         => 'Failed Assessment',
+                                    'failed_interview'          => 'Failed Interview',
+                                    'not_selected'              => 'Not Selected',
+                                    'rejected'                  => 'Rejected',
+                                    'withdrawn'                 => 'Withdrawn',
+                                    'no_show'                   => 'No-Show',
+                                    'offer_declined'            => 'Offer Declined',
+                                ])
+
+                        ])
+                        ->modalWidth("md"),
+
+                    ActionGroup::make([
+                        Action::make('Acknowledgement Email')
+                            ->icon(Heroicon::BellAlert),
+                        Action::make('Letter of Regret')
+                            ->icon(Heroicon::BellAlert),
+                        Action::make('Custom Message')
+                            ->icon(Heroicon::BellAlert),
+
+                    ])
+                        ->label("Send Email Notification")
+                        ->icon(Heroicon::Envelope),
+
+
+                    ActionGroup::make([
+                        Action::make('Educational Background')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Training')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Experience')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Eligibility')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Incomplete file uploads')
+                            ->icon(Heroicon::InformationCircle),
+                        Action::make('Others')
+                            ->icon(Heroicon::InformationCircle),
+
+                    ])
+                        ->label("Mark not qualified")
+                        ->icon(Heroicon::NoSymbol)
+                        ->color("danger"),
+                    BulkAction::make("Set for Initial screening")
+                        ->icon(Heroicon::ChatBubbleBottomCenter)
+                        ->color("success"),
+                    BulkAction::make("Set for Interview")
+                        ->icon(Heroicon::Calendar)
+                        ->color("warning"),
+
+                    // DeleteBulkAction::make(),
+                    // ForceDeleteBulkAction::make(),
+                    // RestoreBulkAction::make(),
                 ]),
             ]);
     }

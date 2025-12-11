@@ -20,7 +20,7 @@ class ApplicantInformation extends Model
         'place_of_birth',
         'date_of_birth',
         'resident_address',
-        '   ',
+        'residential_phone',
         'residential_zipcode',
         'permanent_address',
         'permanent_phone',
